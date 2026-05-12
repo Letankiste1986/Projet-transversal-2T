@@ -4,9 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "concurrently \"npm run dev --prefix client\" \"npm run dev --prefix server\"",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+  "docker:up": "docker compose up -d",
+  "docker:down": "docker compose down",
+  "docker:ps": "docker compose ps",
+  "dev": "npm run docker:up && concurrently \"npm run dev --prefix client\" \"npm run dev --prefix server\""
+    },
   "keywords": [],
   "author": "",
   "license": "ISC",
