@@ -11,6 +11,19 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+  mqtt:
+    image: eclipse-mosquitto:2
+    container_name: projet_transversal_mqtt
+    restart: unless-stopped
+    ports:
+      - "1883:1883"
+    volumes:
+      - ./mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+      - ./mosquitto/passwords:/mosquitto/config/passwords:ro
+      - mqtt_data:/mosquitto/data
+      - mqtt_logs:/mosquitto/log
 
 volumes:
   postgres_data:
+  mqtt_data:
+  mqtt_logs:
