@@ -64,6 +64,15 @@
   color: #2563eb;
 }
 
+.activeLink {
+
+  background: #eff6ff;
+
+  color: #2563eb !important;
+
+  font-weight: 600;
+}
+
 /* ========================= */
 
 .main {

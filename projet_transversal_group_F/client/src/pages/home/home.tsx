@@ -1,6 +1,7 @@
 ﻿import style from './home.module.css';
 
 import { useState } from 'react';
+import { NavLink } from 'react-router-dom';
 
 import {
     ResponsiveContainer,
@@ -81,10 +82,9 @@ function Home() {
 
                 <nav>
 
-                    <a href="#">Dashboard</a>
-                    <a href="#">Capteurs</a>
-                    <a href="#">Alertes</a>
-                    <a href="#">Historique</a>
+                    <NavLink to="/" end className={({ isActive }) => isActive ? style.activeLink : ""}>Dashboard</NavLink>
+                    <NavLink to="#" className="">Alertes</NavLink>
+                    <NavLink to="/historique" className={({ isActive }) => isActive ? style.activeLink : ""}>Historique</NavLink>
 
                 </nav>
 
