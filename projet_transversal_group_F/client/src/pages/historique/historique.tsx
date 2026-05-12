@@ -103,7 +103,6 @@ function Historique() {
                 <nav>
 
                     <NavLink to="/" end className={({ isActive }) => isActive ? style.activeLink : ""}>Dashboard</NavLink>
-                    <NavLink to="#" className="">Alertes</NavLink>
                     <NavLink to="/historique" className={({ isActive }) => isActive ? style.activeLink : ""}>Historique</NavLink>
 
                 </nav>
