@@ -8,17 +8,17 @@ import { NavLink } from 'react-router-dom';
 // =========================
 
 const tempJour = [
-    { time: "08h00", valeur: 21.2, statut: "Normal" },
-    { time: "09h00", valeur: 22.8, statut: "Normal" },
-    { time: "10h00", valeur: 24.1, statut: "Normal" },
-    { time: "11h00", valeur: 25.7, statut: "Normal" },
-    { time: "12h00", valeur: 27.3, statut: "Élevé" },
-    { time: "13h00", valeur: 29.0, statut: "Élevé" },
-    { time: "14h00", valeur: 30.4, statut: "Élevé" },
-    { time: "15h00", valeur: 29.8, statut: "Élevé" },
-    { time: "16h00", valeur: 28.2, statut: "Normal" },
-    { time: "17h00", valeur: 26.5, statut: "Normal" },
-    { time: "18h00", valeur: 24.9, statut: "Normal" },
+    { time: "08h00:12", valeur: 21.2, statut: "Normal" },
+    { time: "09h00:34", valeur: 22.8, statut: "Normal" },
+    { time: "10h00:07", valeur: 24.1, statut: "Normal" },
+    { time: "11h00:51", valeur: 25.7, statut: "Normal" },
+    { time: "12h00:23", valeur: 27.3, statut: "Élevé" },
+    { time: "13h00:45", valeur: 29.0, statut: "Élevé" },
+    { time: "14h00:18", valeur: 30.4, statut: "Élevé" },
+    { time: "15h00:03", valeur: 29.8, statut: "Élevé" },
+    { time: "16h00:39", valeur: 28.2, statut: "Normal" },
+    { time: "17h00:56", valeur: 26.5, statut: "Normal" },
+    { time: "18h00:28", valeur: 24.9, statut: "Normal" },
 ];
 
 const tempSemaine = [
@@ -43,17 +43,17 @@ const tempMois = [
 // =========================
 
 const humJour = [
-    { time: "08h00", valeur: 58, statut: "Normal" },
-    { time: "09h00", valeur: 55, statut: "Normal" },
-    { time: "10h00", valeur: 52, statut: "Normal" },
-    { time: "11h00", valeur: 49, statut: "Normal" },
-    { time: "12h00", valeur: 45, statut: "Bas" },
-    { time: "13h00", valeur: 42, statut: "Bas" },
-    { time: "14h00", valeur: 40, statut: "Bas" },
-    { time: "15h00", valeur: 43, statut: "Bas" },
-    { time: "16h00", valeur: 47, statut: "Normal" },
-    { time: "17h00", valeur: 51, statut: "Normal" },
-    { time: "18h00", valeur: 54, statut: "Normal" },
+    { time: "08h00:12", valeur: 58, statut: "Normal" },
+    { time: "09h00:34", valeur: 55, statut: "Normal" },
+    { time: "10h00:07", valeur: 52, statut: "Normal" },
+    { time: "11h00:51", valeur: 49, statut: "Normal" },
+    { time: "12h00:23", valeur: 45, statut: "Bas" },
+    { time: "13h00:45", valeur: 42, statut: "Bas" },
+    { time: "14h00:18", valeur: 40, statut: "Bas" },
+    { time: "15h00:03", valeur: 43, statut: "Bas" },
+    { time: "16h00:39", valeur: 47, statut: "Normal" },
+    { time: "17h00:56", valeur: 51, statut: "Normal" },
+    { time: "18h00:28", valeur: 54, statut: "Normal" },
 ];
 
 const humSemaine = [
