@@ -83,7 +83,6 @@ function Home() {
                 <nav>
 
                     <NavLink to="/" end className={({ isActive }) => isActive ? style.activeLink : ""}>Dashboard</NavLink>
-                    <NavLink to="#" className="">Alertes</NavLink>
                     <NavLink to="/historique" className={({ isActive }) => isActive ? style.activeLink : ""}>Historique</NavLink>
 
                 </nav>
@@ -119,24 +118,6 @@ function Home() {
                         <div>
                             <span>Humidité</span>
                             <h3>56%</h3>
-                        </div>
-                    </div>
-
-                    <div className={style.card}>
-                        <p className={style.icon}>🌍</p>
-
-                        <div>
-                            <span>Pression</span>
-                            <h3>1014 hPa</h3>
-                        </div>
-                    </div>
-
-                    <div className={style.card}>
-                        <p className={style.icon}>🔔</p>
-
-                        <div>
-                            <span>Alarme</span>
-                            <h3>Active</h3>
                         </div>
                     </div>
 
