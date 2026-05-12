@@ -1,6 +1,6 @@
 import mqtt from 'mqtt'
 import { createMesureObject, parseSensorValue } from '../parser/parseMesure'
-import { prisma } from '../prisma'
+import { prisma } from '../config/prisma'
 
 let mqttClient: mqtt.MqttClient | null = null
 

@@ -3,7 +3,7 @@ import { publishMqttMessage } from '../mqtt/mqttClient';
 
 const router = Router();
 
-router.post('/api/mesures/request', async (req: Request, res: Response) => {
+router.post('/', async (req: Request, res: Response) => {
   try {
     await publishMqttMessage('maison/led', 'ON')
     return res.json({ message: 'Commande envoyée au Pico' })
