@@ -5,3 +5,12 @@ export const allData = async ()=> {
 
     return data;
 }
+
+export const lastData = async () => {
+    const data = await prisma.mesure.findFirst({
+        orderBy: {
+            createdAt: 'desc',
+        }
+    })
+    return data;
+}

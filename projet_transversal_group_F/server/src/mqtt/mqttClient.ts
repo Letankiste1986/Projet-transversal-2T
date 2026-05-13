@@ -1,6 +1,8 @@
 import mqtt from 'mqtt'
 import { createMesureObject, parseSensorValue } from '../parser/parseMesure'
-import { prisma } from '../config/prisma'
+import prisma from '../config/prisma'
+import { io } from '../../server';
+
 
 let mqttClient: mqtt.MqttClient | null = null
 
@@ -13,6 +15,8 @@ async function saveMesure(temperature: number, humidite: number) {
     })
 
     console.log('Mesure enregistrée:', createdMesure)
+
+    io.emit('new-mesure', createdMesure);
 }
 
 //Récupère les credentials du .env

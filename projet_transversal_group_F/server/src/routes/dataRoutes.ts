@@ -6,4 +6,6 @@ const router = express.Router();
 
 router.get("/",data.getAllData);
 
+router.get("/last",data.getLastData);
+
 export default router;
