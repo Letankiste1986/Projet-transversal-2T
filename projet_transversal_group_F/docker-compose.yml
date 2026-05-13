@@ -11,6 +11,14 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U app -d projet_transversal"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - app_net
+
   mqtt:
     image: eclipse-mosquitto:2
     container_name: projet_transversal_mqtt
@@ -22,8 +30,58 @@ services:
       - ./mosquitto/passwords:/mosquitto/config/passwords:ro
       - mqtt_data:/mosquitto/data
       - mqtt_logs:/mosquitto/log
+    networks:
+      - app_net
+
+  server:
+    build:
+      context: ./server
+    container_name: projet_transversal_server
+    restart: unless-stopped
+    environment:
+      PORT: 3000
+      DATABASE_URL: postgresql://app:app@db:5432/projet_transversal
+      MQTT_URL: mqtt://mqtt:1883
+      MQTT_USERNAME: app
+      MQTT_PASSWORD: app
+      MQTT_TEMPERATURE_TOPIC: maison/tem
+      MQTT_HUMIDITY_TOPIC: maison/hum
+    depends_on:
+      db:
+        condition: service_healthy
+      mqtt:
+        condition: service_started
+    networks:
+      - app_net
+
+  client:
+    build:
+      context: ./client
+    container_name: projet_transversal_client
+    restart: unless-stopped
+    depends_on:
+      - server
+    networks:
+      - app_net
+
+  proxy:
+    image: nginx:alpine
+    container_name: projet_transversal_proxy
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - client
+      - server
+    networks:
+      - app_net
 
 volumes:
   postgres_data:
   mqtt_data:
   mqtt_logs:
+
+networks:
+  app_net:

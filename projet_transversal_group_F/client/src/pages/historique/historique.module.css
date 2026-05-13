@@ -101,11 +101,48 @@
   margin-bottom: 0;
 }
 
+.header div {
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 16px;
+}
+
 .header h1 {
 
   font-size: 2rem;
 
   color: #111827;
+}
+
+.liveStatus,
+.offlineStatus {
+
+  padding: 6px 12px;
+
+  border-radius: 999px;
+
+  font-size: 0.85rem;
+
+  font-weight: 700;
+}
+
+.liveStatus {
+
+  background: #dcfce7;
+
+  color: #15803d;
+}
+
+.offlineStatus {
+
+  background: #fee2e2;
+
+  color: #b91c1c;
 }
 
 /* ========================= */
@@ -258,7 +295,7 @@
   color: #16a34a;
 }
 
-.badgeÉlevé {
+.badgeEleve {
 
   display: inline-block;
 
@@ -327,5 +364,12 @@
     padding: 10px 12px;
 
     font-size: 0.85rem;
+  }
+
+  .header div {
+
+    align-items: flex-start;
+
+    flex-direction: column;
   }
 }

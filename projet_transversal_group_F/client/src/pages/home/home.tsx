@@ -1,6 +1,6 @@
-﻿import style from './home.module.css';
+import style from './home.module.css';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { NavLink } from 'react-router-dom';
 
 import {
@@ -14,80 +14,51 @@ import {
     Legend
 } from 'recharts';
 
+import { useMesures } from '../../hooks/useMesures';
+import { getChartData, type Period } from '../../services/mesures';
+
 function Home() {
 
-    const [periodeTemp, setPeriodeTemp] = useState("jour");
-    const [periodeHum, setPeriodeHum] = useState("jour");
+    const [periodeTemp, setPeriodeTemp] = useState<Period>("jour");
+    const [periodeHum, setPeriodeHum] = useState<Period>("jour");
+    const [isSendingPicoCommand, setIsSendingPicoCommand] = useState(false);
+    const [picoMessage, setPicoMessage] = useState<string | null>(null);
+    const { mesures, lastMesure, isLoading, error, isLive } = useMesures();
 
-    // =========================
-    // DONNÉES TEMPÉRATURE
-    // =========================
+    const dataTemp = useMemo(
+        () => getChartData(mesures, periodeTemp),
+        [mesures, periodeTemp]
+    );
 
-    const tempJour = [
-        { time: "08h", temperature: 22 },
-        { time: "10h", temperature: 24 },
-        { time: "12h", temperature: 27 },
-        { time: "14h", temperature: 29 },
-        { time: "16h", temperature: 28 },
-        { time: "18h", temperature: 25 }
-    ];
+    const dataHum = useMemo(
+        () => getChartData(mesures, periodeHum),
+        [mesures, periodeHum]
+    );
 
-    const tempSemaine = [
-        { time: "Lun", temperature: 22 },
-        { time: "Mar", temperature: 24 },
-        { time: "Mer", temperature: 26 },
-        { time: "Jeu", temperature: 29 },
-        { time: "Ven", temperature: 27 },
-        { time: "Sam", temperature: 25 },
-        { time: "Dim", temperature: 23 }
-    ];
+    const temperature = lastMesure ? `${lastMesure.temperature.toFixed(1)}°C` : "--";
+    const humidite = lastMesure ? `${lastMesure.humidite.toFixed(1)}%` : "--";
+    const statusText = error ?? (isLoading ? "Chargement" : isLive ? "Live" : "Hors ligne");
 
-    const tempMois = [
-        { time: "S1", temperature: 22 },
-        { time: "S2", temperature: 27 },
-        { time: "S3", temperature: 25 },
-        { time: "S4", temperature: 29 }
-    ];
+    async function sendPicoCommand() {
+        setIsSendingPicoCommand(true);
+        setPicoMessage(null);
 
-    // =========================
-    // DONNÉES HUMIDITÉ
-    // =========================
+        try {
+            const response = await fetch('/api/pico', {
+                method: 'POST',
+            });
 
-    const humJour = [
-        { time: "08h", humidite: 58 },
-        { time: "10h", humidite: 55 },
-        { time: "12h", humidite: 49 },
-        { time: "14h", humidite: 42 },
-        { time: "16h", humidite: 47 },
-        { time: "18h", humidite: 54 }
-    ];
+            if (!response.ok) {
+                throw new Error('Commande refusee');
+            }
 
-    const humSemaine = [
-        { time: "Lun", humidite: 62 },
-        { time: "Mar", humidite: 58 },
-        { time: "Mer", humidite: 53 },
-        { time: "Jeu", humidite: 47 },
-        { time: "Ven", humidite: 39 },
-        { time: "Sam", humidite: 44 },
-        { time: "Dim", humidite: 60 }
-    ];
-
-    const humMois = [
-        { time: "S1", humidite: 64 },
-        { time: "S2", humidite: 57 },
-        { time: "S3", humidite: 41 },
-        { time: "S4", humidite: 55 }
-    ];
-
-    const dataTemp =
-        periodeTemp === "semaine" ? tempSemaine :
-        periodeTemp === "mois"   ? tempMois    :
-        tempJour;
-
-    const dataHum =
-        periodeHum === "semaine" ? humSemaine :
-        periodeHum === "mois"   ? humMois    :
-        humJour;
+            setPicoMessage('Commande envoyée au Pico');
+        } catch {
+            setPicoMessage('Impossible de contacter le Pico');
+        } finally {
+            setIsSendingPicoCommand(false);
+        }
+    }
 
     return (
 
@@ -110,13 +81,12 @@ function Home() {
 
                 <header className={style.header}>
 
-                    <h1>Dashboard</h1>
+                    <div>
+                        <h1>Dashboard</h1>
+                        <p className={isLive ? style.liveStatus : style.offlineStatus}>{statusText}</p>
+                    </div>
 
                 </header>
-
-                {/* ========================= */}
-                {/* CARDS */}
-                {/* ========================= */}
 
                 <section className={style.cards}>
 
@@ -125,7 +95,7 @@ function Home() {
 
                         <div>
                             <span>Température</span>
-                            <h3>29°C</h3>
+                            <h3>{temperature}</h3>
                         </div>
                     </div>
 
@@ -134,15 +104,27 @@ function Home() {
 
                         <div>
                             <span>Humidité</span>
-                            <h3>56%</h3>
+                            <h3>{humidite}</h3>
+                        </div>
+                    </div>
+
+                    <div className={style.card}>
+                        <p className={style.icon}>💡</p>
+
+                        <div className={style.picoControl}>
+                            <span>Commande Pico</span>
+                            <button
+                                className={style.picoButton}
+                                disabled={isSendingPicoCommand}
+                                onClick={sendPicoCommand}
+                            >
+                                {isSendingPicoCommand ? 'Envoi...' : 'Allumer'}
+                            </button>
+                            {picoMessage && <p>{picoMessage}</p>}
                         </div>
                     </div>
 
                 </section>
-
-                {/* ========================= */}
-                {/* GRAPHIQUE */}
-                {/* ========================= */}
 
                 <section className={style.graphContainer}>
 
@@ -153,7 +135,7 @@ function Home() {
                         <div className={style.buttons}>
 
                             <button
-                                className={periodeTemp === "jour"    ? style.buttonActive : ""}
+                                className={periodeTemp === "jour" ? style.buttonActive : ""}
                                 onClick={() => setPeriodeTemp("jour")}
                             >
                                 Jour
@@ -167,7 +149,7 @@ function Home() {
                             </button>
 
                             <button
-                                className={periodeTemp === "mois"    ? style.buttonActive : ""}
+                                className={periodeTemp === "mois" ? style.buttonActive : ""}
                                 onClick={() => setPeriodeTemp("mois")}
                             >
                                 Mois
@@ -196,8 +178,10 @@ function Home() {
                                 <Line
                                     type="monotone"
                                     dataKey="temperature"
+                                    name="Température"
                                     stroke="#2563eb"
                                     strokeWidth={3}
+                                    dot={false}
                                 />
 
                             </LineChart>
@@ -208,10 +192,6 @@ function Home() {
 
                 </section>
 
-                {/* ========================= */}
-                {/* GRAPHIQUE HUMIDITÉ */}
-                {/* ========================= */}
-
                 <section className={style.graphContainer}>
 
                     <div className={style.graphTop}>
@@ -221,7 +201,7 @@ function Home() {
                         <div className={style.buttons}>
 
                             <button
-                                className={periodeHum === "jour"    ? style.buttonActive : ""}
+                                className={periodeHum === "jour" ? style.buttonActive : ""}
                                 onClick={() => setPeriodeHum("jour")}
                             >
                                 Jour
@@ -235,7 +215,7 @@ function Home() {
                             </button>
 
                             <button
-                                className={periodeHum === "mois"    ? style.buttonActive : ""}
+                                className={periodeHum === "mois" ? style.buttonActive : ""}
                                 onClick={() => setPeriodeHum("mois")}
                             >
                                 Mois
@@ -264,8 +244,10 @@ function Home() {
                                 <Line
                                     type="monotone"
                                     dataKey="humidite"
+                                    name="Humidité"
                                     stroke="#06b6d4"
                                     strokeWidth={3}
+                                    dot={false}
                                 />
 
                             </LineChart>

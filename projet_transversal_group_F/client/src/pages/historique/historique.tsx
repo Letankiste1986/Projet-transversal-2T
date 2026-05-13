@@ -1,96 +1,27 @@
 import style from './historique.module.css';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { NavLink } from 'react-router-dom';
-
-// =========================
-// DONNÉES TEMPÉRATURE
-// =========================
-
-const tempJour = [
-    { time: "08h00:12", valeur: 21.2, statut: "Normal" },
-    { time: "09h00:34", valeur: 22.8, statut: "Normal" },
-    { time: "10h00:07", valeur: 24.1, statut: "Normal" },
-    { time: "11h00:51", valeur: 25.7, statut: "Normal" },
-    { time: "12h00:23", valeur: 27.3, statut: "Élevé" },
-    { time: "13h00:45", valeur: 29.0, statut: "Élevé" },
-    { time: "14h00:18", valeur: 30.4, statut: "Élevé" },
-    { time: "15h00:03", valeur: 29.8, statut: "Élevé" },
-    { time: "16h00:39", valeur: 28.2, statut: "Normal" },
-    { time: "17h00:56", valeur: 26.5, statut: "Normal" },
-    { time: "18h00:28", valeur: 24.9, statut: "Normal" },
-];
-
-const tempSemaine = [
-    { time: "Lundi",    valeur: 22.4, statut: "Normal" },
-    { time: "Mardi",    valeur: 24.1, statut: "Normal" },
-    { time: "Mercredi", valeur: 26.7, statut: "Normal" },
-    { time: "Jeudi",    valeur: 29.3, statut: "Élevé" },
-    { time: "Vendredi", valeur: 31.0, statut: "Élevé" },
-    { time: "Samedi",   valeur: 27.5, statut: "Normal" },
-    { time: "Dimanche", valeur: 23.8, statut: "Normal" },
-];
-
-const tempMois = [
-    { time: "Semaine 1", valeur: 21.9, statut: "Normal" },
-    { time: "Semaine 2", valeur: 25.4, statut: "Normal" },
-    { time: "Semaine 3", valeur: 29.7, statut: "Élevé" },
-    { time: "Semaine 4", valeur: 27.2, statut: "Normal" },
-];
-
-// =========================
-// DONNÉES HUMIDITÉ
-// =========================
-
-const humJour = [
-    { time: "08h00:12", valeur: 58, statut: "Normal" },
-    { time: "09h00:34", valeur: 55, statut: "Normal" },
-    { time: "10h00:07", valeur: 52, statut: "Normal" },
-    { time: "11h00:51", valeur: 49, statut: "Normal" },
-    { time: "12h00:23", valeur: 45, statut: "Bas" },
-    { time: "13h00:45", valeur: 42, statut: "Bas" },
-    { time: "14h00:18", valeur: 40, statut: "Bas" },
-    { time: "15h00:03", valeur: 43, statut: "Bas" },
-    { time: "16h00:39", valeur: 47, statut: "Normal" },
-    { time: "17h00:56", valeur: 51, statut: "Normal" },
-    { time: "18h00:28", valeur: 54, statut: "Normal" },
-];
-
-const humSemaine = [
-    { time: "Lundi",    valeur: 62, statut: "Normal" },
-    { time: "Mardi",    valeur: 58, statut: "Normal" },
-    { time: "Mercredi", valeur: 53, statut: "Normal" },
-    { time: "Jeudi",    valeur: 47, statut: "Normal" },
-    { time: "Vendredi", valeur: 39, statut: "Bas" },
-    { time: "Samedi",   valeur: 44, statut: "Normal" },
-    { time: "Dimanche", valeur: 60, statut: "Normal" },
-];
-
-const humMois = [
-    { time: "Semaine 1", valeur: 64, statut: "Normal" },
-    { time: "Semaine 2", valeur: 57, statut: "Normal" },
-    { time: "Semaine 3", valeur: 41, statut: "Bas" },
-    { time: "Semaine 4", valeur: 55, statut: "Normal" },
-];
-
-// =========================
-// COMPOSANT
-// =========================
+import { useMesures } from '../../hooks/useMesures';
+import { getHistoryRows, type Period } from '../../services/mesures';
 
 function Historique() {
 
-    const [periodeTemp, setPeriodeTemp] = useState("jour");
-    const [periodeHum, setPeriodeHum] = useState("jour");
+    const [periodeTemp, setPeriodeTemp] = useState<Period>("jour");
+    const [periodeHum, setPeriodeHum] = useState<Period>("jour");
+    const { mesures, isLoading, error, isLive } = useMesures();
 
-    const dataTemp =
-        periodeTemp === "semaine" ? tempSemaine :
-        periodeTemp === "mois"   ? tempMois    :
-        tempJour;
+    const dataTemp = useMemo(
+        () => getHistoryRows(mesures, periodeTemp),
+        [mesures, periodeTemp]
+    );
 
-    const dataHum =
-        periodeHum === "semaine" ? humSemaine :
-        periodeHum === "mois"   ? humMois    :
-        humJour;
+    const dataHum = useMemo(
+        () => getHistoryRows(mesures, periodeHum),
+        [mesures, periodeHum]
+    );
+
+    const statusText = error ?? (isLoading ? "Chargement" : isLive ? "Live" : "Hors ligne");
 
     return (
 
@@ -112,12 +43,11 @@ function Historique() {
             <main className={style.main}>
 
                 <header className={style.header}>
-                    <h1>Historique</h1>
+                    <div>
+                        <h1>Historique</h1>
+                        <p className={isLive ? style.liveStatus : style.offlineStatus}>{statusText}</p>
+                    </div>
                 </header>
-
-                {/* ========================= */}
-                {/* TABLEAU TEMPÉRATURE */}
-                {/* ========================= */}
 
                 <section className={style.tableContainer}>
 
@@ -128,7 +58,7 @@ function Historique() {
                         <div className={style.buttons}>
 
                             <button
-                                className={periodeTemp === "jour"    ? style.buttonActive : ""}
+                                className={periodeTemp === "jour" ? style.buttonActive : ""}
                                 onClick={() => setPeriodeTemp("jour")}
                             >
                                 Jour
@@ -142,7 +72,7 @@ function Historique() {
                             </button>
 
                             <button
-                                className={periodeTemp === "mois"    ? style.buttonActive : ""}
+                                className={periodeTemp === "mois" ? style.buttonActive : ""}
                                 onClick={() => setPeriodeTemp("mois")}
                             >
                                 Mois
@@ -163,16 +93,16 @@ function Historique() {
                         </thead>
 
                         <tbody>
-                            {dataTemp.map((row, i) => (
-                                <tr key={i}>
+                            {dataTemp.map((row) => (
+                                <tr key={row.id}>
                                     <td>{row.time}</td>
-                                    <td>{row.valeur}°C</td>
+                                    <td>{row.temperature}°C</td>
                                     <td>
                                         <span className={
-                                            row.statut === "Élevé" ? style.badgeElevé :
+                                            row.temperatureStatus === "Eleve" ? style.badgeEleve :
                                             style.badgeNormal
                                         }>
-                                            {row.statut}
+                                            {row.temperatureStatus === "Eleve" ? "Élevé" : "Normal"}
                                         </span>
                                     </td>
                                 </tr>
@@ -183,10 +113,6 @@ function Historique() {
 
                 </section>
 
-                {/* ========================= */}
-                {/* TABLEAU HUMIDITÉ */}
-                {/* ========================= */}
-
                 <section className={style.tableContainer}>
 
                     <div className={style.tableTop}>
@@ -196,7 +122,7 @@ function Historique() {
                         <div className={style.buttons}>
 
                             <button
-                                className={periodeHum === "jour"    ? style.buttonActive : ""}
+                                className={periodeHum === "jour" ? style.buttonActive : ""}
                                 onClick={() => setPeriodeHum("jour")}
                             >
                                 Jour
@@ -210,7 +136,7 @@ function Historique() {
                             </button>
 
                             <button
-                                className={periodeHum === "mois"    ? style.buttonActive : ""}
+                                className={periodeHum === "mois" ? style.buttonActive : ""}
                                 onClick={() => setPeriodeHum("mois")}
                             >
                                 Mois
@@ -231,16 +157,16 @@ function Historique() {
                         </thead>
 
                         <tbody>
-                            {dataHum.map((row, i) => (
-                                <tr key={i}>
+                            {dataHum.map((row) => (
+                                <tr key={row.id}>
                                     <td>{row.time}</td>
-                                    <td>{row.valeur}%</td>
+                                    <td>{row.humidite}%</td>
                                     <td>
                                         <span className={
-                                            row.statut === "Bas" ? style.badgeBas :
+                                            row.humidityStatus === "Bas" ? style.badgeBas :
                                             style.badgeNormal
                                         }>
-                                            {row.statut}
+                                            {row.humidityStatus}
                                         </span>
                                     </td>
                                 </tr>

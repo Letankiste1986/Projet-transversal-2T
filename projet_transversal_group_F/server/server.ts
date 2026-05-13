@@ -5,7 +5,7 @@ import 'dotenv/config';
 import { startMqttClient } from './src/mqtt/mqttClient';
 import picoRoutes from './src/routes/picoRoutes';
 import dataRoutes from './src/routes/dataRoutes';
-import prisma from '../server/src/config/prisma';
+import prisma from './src/config/prisma';
 
 const app = express();
 const server = http.createServer(app);
